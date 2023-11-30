@@ -6,6 +6,19 @@ sprites.src = './assets/sprites.png';
 const canvas = document.querySelector('canvas');
 const contexto = canvas.getContext('2d');
 
+const hitSom = new Audio();
+hitSom.src = "./effect/hit.mp3";
+
+function fazColisao(quemColide, ondeColide) {
+    quemColide = flappybird.localY + flappybird.altura;
+    ondeColide = chao.localY
+
+    if(quemColide >= ondeColide){
+        return true;
+    }
+    return false;
+}
+
 const flappybird = {
     spriteX: 0,
     spriteY: 0,
@@ -15,9 +28,24 @@ const flappybird = {
     localY: 50,
     valocidade: 0,
     gravidade: 0.25,
+    pulu: 4.6,
+    pular() {
+        console.log("PULOUUU")
+        flappybird.valocidade = - flappybird.pulu
+    },
     atualiza() {
+        if(fazColisao(flappybird, chao)){
+            console.log("Colidiu")
+
+            hitSom.play();
+            setTimeout(()=> {
+                mudarParaTela(Telas.INICIO);
+
+            }, 10000)
+            return;
+        }
+
         flappybird.valocidade = flappybird.valocidade + flappybird.gravidade
-        console.log(flappybird.valocidade)
         flappybird.localY = flappybird.localY + flappybird.valocidade
     },
 
@@ -123,11 +151,11 @@ const getreadyView = {
     }
 };
 
-
 let telaAtiva = {};
 function mudarParaTela(novaTela) {
-    telaAtiva = novaTela
+    telaAtiva = novaTela 
 };
+
 
 const Telas = {
     INICIO: {
@@ -152,8 +180,11 @@ Telas.JOGO = {
         chao.desenha();
         flappybird.desenha();
     },
+    click() {
+        flappybird.pular();
+    },
     atualiza() {
-        flappybird.atualiza();
+       flappybird.atualiza();
     },
 };
 
@@ -174,6 +205,7 @@ window.addEventListener("click", function() {
         telaAtiva.click();
     }
 });
+
 
 mudarParaTela(Telas.INICIO);
  loop();
