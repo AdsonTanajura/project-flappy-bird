@@ -13,6 +13,14 @@ const flappybird = {
     altura: 24,
     localX: 10,
     localY: 50,
+    valocidade: 0,
+    gravidade: 0.25,
+    atualiza() {
+        flappybird.valocidade = flappybird.valocidade + flappybird.gravidade
+        console.log(flappybird.valocidade)
+        flappybird.localY = flappybird.localY + flappybird.valocidade
+    },
+
     desenha() {
         contexto.drawImage(
             sprites,
@@ -99,12 +107,12 @@ const chao = {
 
 function loop() {
 
+    flappybird.atualiza();
     background.desenha();
     chao.desenha();
     flappybird.desenha();
 
-     requestAnimationFrame(loop);
-
+    requestAnimationFrame(loop);
  }
 
  loop();
