@@ -105,14 +105,75 @@ const chao = {
     }
 };
 
-function loop() {
+const getreadyView = {
+    spriteX: 134,
+    spriteY: 0,
+    largura: 174,
+    altura: 152,
+    localX: 74,
+    localY: 164,
+    desenha(){
+        contexto.drawImage(
+            sprites,
+            getreadyView.spriteX, getreadyView.spriteY,
+            getreadyView.largura, getreadyView.altura,
+            getreadyView.localX, getreadyView.localY,
+            getreadyView.largura, getreadyView.altura,
+        );
+    }
+};
 
-    flappybird.atualiza();
-    background.desenha();
-    chao.desenha();
-    flappybird.desenha();
+
+let telaAtiva = {};
+function mudarParaTela(novaTela) {
+    telaAtiva = novaTela
+};
+
+const Telas = {
+    INICIO: {
+        desenha() {
+            background.desenha();
+            chao.desenha();
+            flappybird.desenha();
+            getreadyView.desenha();
+        },
+        click() {
+            mudarParaTela(Telas.JOGO);
+        },
+        atualiza() {
+
+        },
+    }
+};
+
+Telas.JOGO = {
+    desenha() {
+        background.desenha();
+        chao.desenha();
+        flappybird.desenha();
+    },
+    atualiza() {
+        flappybird.atualiza();
+    },
+};
+
+function loop() {
+    Telas.INICIO.atualiza
 
     requestAnimationFrame(loop);
  }
+function loop() {
+    telaAtiva.desenha();
+    telaAtiva.atualiza();
 
+    requestAnimationFrame(loop);
+};
+
+window.addEventListener("click", function() {
+    if(telaAtiva.click) {
+        telaAtiva.click();
+    }
+});
+
+mudarParaTela(Telas.INICIO);
  loop();
