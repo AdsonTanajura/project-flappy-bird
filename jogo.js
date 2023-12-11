@@ -1,5 +1,6 @@
 console.log('Flappy Bird');
 
+let frames = 0;
 const sprites = new Image();
 sprites.src = './assets/sprites.png';
 
@@ -53,13 +54,28 @@ function criaFlappyBird() {
         movimentos: [
             {spriteX: 0, spriteY: 0}, //Primeiro Movimento
             {spriteX: 0, spriteY: 26}, //Segundo Movimento
-            {spriteX: 0, spriteY: 52} //Terceiro Movimento
+            {spriteX: 0, spriteY: 52}, //Terceiro Movimento
         ],
-    
+
+        frameAtual: 0,
+        atualizaOFrameAtual() {
+            const intervaloFrames = 10;
+            const passouOIntervalo = frames % intervaloFrames === 0;
+            if(passouOIntervalo) {
+                const baseDoIncremento = 1;
+                const incremento = baseDoIncremento + flappybird.frameAtual;
+                const baseRepeticao = flappybird.movimentos.length;
+                flappybird.frameAtual = incremento % baseRepeticao;
+            };
+        },
+        
         desenha() {
+            flappybird.atualizaOFrameAtual();
+            const {spriteX, spriteY} = flappybird.movimentos[flappybird.frameAtual];
+
             contexto.drawImage(
                 sprites,
-                flappybird.spriteX, flappybird.spriteY,
+                spriteX, spriteY,
                 flappybird.largura, flappybird.altura,
                 flappybird.localX, flappybird.localY,
                 flappybird.largura, flappybird.altura,
@@ -115,7 +131,7 @@ function criarChao () {
         localX: 0,
         localY: canvas.height - 112,
         atualiza(){
-            console.log('O chão esta se movendo✅')
+            // console.log('O chão esta se movendo✅')
             const movimentoDoChao = 1;
             const repeteEm = chao.largura / 2;
             const movimentacao = chao.localX - movimentoDoChao;
@@ -227,6 +243,7 @@ function loop() {
     telaAtiva.desenha();
     telaAtiva.atualiza();
 
+    frames = frames + 1;
     requestAnimationFrame(loop);
 };
 
