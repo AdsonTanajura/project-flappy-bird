@@ -33,7 +33,7 @@ function criaFlappyBird() {
         gravidade: 0.25,
         pulu: 4.6,
         pular() {
-            console.log("PULOUUU")
+            // console.log("PULOUUU")
             puloSom.play();
             flappybird.valocidade = - flappybird.pulu
         },
@@ -189,6 +189,107 @@ const getreadyView = {
     }
 };
 
+function criarObstaculos(){
+    const obstaculos = {
+        largura: 52,
+        altura: 400,
+        obstCao: {
+            spriteX: 0,
+            spriteY: 169,
+        },
+        obstCeu: {
+            spriteX: 52,
+            spriteY: 169
+        },
+        espaco: 80,
+    
+        desenha(){ 
+            obstaculos.pares.forEach(function(par) {
+                const yRandom = par.y;
+                const espacamentoEntreObstaculo = 90;
+    
+                const obstCeuX = par.x;
+                const obstCeuY = yRandom;
+                contexto.drawImage(
+                    sprites,
+                    obstaculos.obstCeu.spriteX, obstaculos.obstCeu.spriteY,
+                    obstaculos.largura, obstaculos.altura,
+                    obstCeuX, obstCeuY,
+                    obstaculos.largura, obstaculos.altura,
+                );
+                const obstCaoX = par.x;
+                const obstCaoY = obstaculos.altura + espacamentoEntreObstaculo + yRandom;
+                contexto.drawImage(
+                    sprites,
+                    obstaculos.obstCao.spriteX, obstaculos.obstCao.spriteY,
+                    obstaculos.largura, obstaculos.altura,
+                    obstCaoX, obstCaoY,
+                    obstaculos.largura, obstaculos.altura,
+                );
+
+                par.obstCeu = {
+                    x: obstCeuX,
+                    y: obstaculos.altura + obstCeuY
+                };
+                par.obstCao = {
+                    x: obstCaoX,
+                    y: obstCaoY
+                };
+
+            });
+        },
+
+        temColisao(par) {
+            const topFlappybird = globais.flappybird.localY;
+            const downFlappybird = globais.flappybird.localY + globais.flappybird.altura;
+
+            if(globais.flappybird.localX >= par.x) {
+                if(topFlappybird <= par.obstCeu.y) {
+                    // console.log('Bateu!!!!!')
+                    return true;
+                };
+
+                if(downFlappybird >= par.obstCao.y) {
+                    // // console.log('Bateu!!!!!')
+                    return true;
+                };
+            }
+        },
+
+        pares: [
+        ],
+        atualiza() {
+            const passou100frames = frames % 100 === 0;
+            if(passou100frames) {
+                // console.log('Passou 100 frames');
+                obstaculos.pares.push(
+                    {
+                        x:canvas.width,
+                        y:-150 * (Math.random() + 1),
+                    },
+                );
+            }
+        
+
+            obstaculos.pares.forEach(function(par) {
+                par.x = par.x - 2;
+                
+                if(obstaculos.temColisao(par)) {
+                    mudarParaTela(Telas.INICIO);
+                    hitSom.play();
+                    // console.log('Você Perdeu')
+                }
+
+                if(par.x + obstaculos.largura <= 0) {
+                    obstaculos.pares.shift();
+                }
+            });
+
+        },
+    };
+    return obstaculos;
+};
+
 let telaAtiva = {};
 function mudarParaTela(novaTela) {
     telaAtiva = novaTela 
@@ -204,12 +305,14 @@ const Telas = {
         inicializa() {
             globais.flappybird = criaFlappyBird();
             globais.chao = criarChao();
+            globais.obstaculos = criarObstaculos();
         },
         desenha() {
             background.desenha();
             globais.chao.desenha();
             globais.flappybird.desenha();
             getreadyView.desenha();
+            
         },
         click() {
             mudarParaTela(Telas.JOGO);
@@ -223,6 +326,7 @@ const Telas = {
 Telas.JOGO = {
     desenha() {
         background.desenha();
+        globais.obstaculos.desenha();
         globais.chao.desenha();
         globais.flappybird.desenha();
     },
@@ -230,7 +334,9 @@ Telas.JOGO = {
         globais.flappybird.pular();
     },
     atualiza() {
-       globais.flappybird.atualiza();
+        globais.obstaculos.atualiza();
+        globais.chao.atualiza();
+        globais.flappybird.atualiza();
     },
 };
 
